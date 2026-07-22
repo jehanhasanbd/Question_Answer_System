@@ -6,26 +6,26 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
 from src.config import Config, default_config
-from src.utils import predict, inverse_vocab
+from src.utils import predict
 from src.model import create_model
 from src.train import train_model
 
 
 def load_model(
-        checkpoint_path: Optional[str] = None,
-        vocab_path: Optional[str] = None,
-        config: Optional[Config] = None
+    checkpoint_path: Optional[str] = None,
+    vocab_path: Optional[str] = None,
+    config: Optional[Config] = None
 ) -> Tuple[torch.nn.Module, Dict, Config]:
     """
-    Load a trained model and vocabulary.
+        Load a trained model and vocabulary.
 
-    Args:
-        checkpoint_path: Path to model checkpoint (if None, load best model)
-        vocab_path: Path to vocabulary file (if None, load from checkpoint dir)
-        config: Configuration object (if None, load from checkpoint)
+        Args:
+            checkpoint_path: Path to model checkpoint (if None, load best model)
+            vocab_path: Path to vocabulary file (if None, load from checkpoint dir)
+            config: Configuration object (if None, load from checkpoint)
 
-    Returns:
-        Tuple of (model, vocab, config)
+        Returns:
+            Tuple of (model, vocab, config)
     """
     if config is None:
         config = default_config
@@ -48,7 +48,7 @@ def load_model(
         raise FileNotFoundError(f"Vocabulary not found at {vocab_path}")
 
     # Load vocabulary
-    with open(vocab_path, 'rb') as f:
+    with open(vocab_path, "rb") as f:
         vocab = pickle.load(f)
 
     # Load checkpoint
@@ -62,36 +62,35 @@ def load_model(
     model = create_model(len(vocab), config)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.to(config.device)
-    model.eval()  # Set to evaluation mode
+    model.eval()
 
     print(f"Model loaded from {checkpoint_path}")
-    if 'epoch' in checkpoint:
+    if "epoch" in checkpoint:
         print(f"Trained for {checkpoint['epoch']} epochs, Loss: {checkpoint.get('loss', 'N/A')}")
 
     return model, vocab, config
 
-
 def evaluate_model(
-        model: torch.nn.Module,
-        vocab: Dict[str, int],
-        test_questions: List[str],
-        expected_answers: List[str] = None,
-        threshold: float = None,
-        config: Config = None
+    model: torch.nn.Module,
+    vocab: Dict[str, int],
+    test_questions: List[str],
+    expected_answers: List[str] = None,
+    threshold: float = None,
+    config: Config = None,
 ) -> List[Tuple[str, str, float, str]]:
     """
-    Evaluate model on test questions.
+        Evaluate model on test questions.
 
-    Args:
-        model: Trained model
-        vocab: Vocabulary dictionary
-        test_questions: List of questions to test
-        expected_answers: List of expected answers (optional)
-        threshold: Probability threshold
-        config: Configuration object
+        Args:
+            model: Trained model
+            vocab: Vocabulary dictionary
+            test_questions: List of questions to test
+            expected_answers: List of expected answers (optional)
+            threshold: Probability threshold
+            config: Configuration object
 
-    Returns:
-        List of tuples (question, predicted_answer, probability, expected_answer)
+        Returns:
+            List of tuples (question, predicted_answer, probability, expected_answer)
     """
     if config is None:
         config = default_config
@@ -99,10 +98,10 @@ def evaluate_model(
     if threshold is None:
         threshold = config.threshold
 
-    model.eval()  # Set to evaluation mode
+    model.eval()
     results = []
 
-    with torch.no_grad():  # Disable gradient computation
+    with torch.no_grad():
         for i, question in enumerate(test_questions):
             predicted_word, probability = predict(
                 model, question, vocab, config, threshold
@@ -112,7 +111,6 @@ def evaluate_model(
             results.append((question, predicted_word, probability, expected))
 
     return results
-
 
 def print_evaluation_results(results: List[Tuple[str, str, float, str]]):
     """Pretty print evaluation results."""
@@ -138,7 +136,6 @@ def print_evaluation_results(results: List[Tuple[str, str, float, str]]):
         accuracy = correct / total * 100
         print(f"\nAccuracy: {accuracy:.2f}% ({correct}/{total})")
     print("=" * 80)
-
 
 def test_sample_questions(
         model: torch.nn.Module = None,

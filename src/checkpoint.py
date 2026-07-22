@@ -9,8 +9,7 @@ from datetime import datetime
 from src.config import Config, default_config
 from src.model import create_model
 
-
-def list_checkpoints(checkpoint_dir: str = None) -> list:
+def list_checkpoints(checkpoint_dir: str= None) -> list:
     """List all available checkpoints."""
     if checkpoint_dir is None:
         checkpoint_dir = default_config.checkpoint_dir
@@ -26,7 +25,7 @@ def list_checkpoints(checkpoint_dir: str = None) -> list:
     print(f"\nAvailable checkpoints in {checkpoint_dir}:")
     print("-" * 60)
     for cp in checkpoints:
-        size = cp.stat().st_size / (1024 * 1024)  # Size in MB
+        size = cp.stat().st_size / (1024 * 1024)
         mtime = datetime.fromtimestamp(cp.stat().st_mtime)
         print(f"{cp.name:30} {size:6.2f} MB  {mtime.strftime('%Y-%m-%d %H:%M:%S')}")
 
@@ -34,8 +33,8 @@ def list_checkpoints(checkpoint_dir: str = None) -> list:
 
 
 def load_best_model(
-        checkpoint_dir: str = None,
-        device: str = None
+    checkpoint_dir: str= None,
+    device: str = None
 ) -> Tuple[torch.nn.Module, Dict, Config]:
     """
     Load the best model from checkpoint directory.
@@ -60,7 +59,7 @@ def load_best_model(
     # Load config
     config = default_config
     if config_path.exists():
-        with open(config_path, 'rb') as f:
+        with open(config_path, "rb") as f:
             config = pickle.load(f)
 
     # Load vocabulary
@@ -70,7 +69,7 @@ def load_best_model(
     with open(vocab_path, 'rb') as f:
         vocab = pickle.load(f)
 
-    # Load model
+    # Load Model
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"Best model not found at {checkpoint_path}")
 
@@ -87,36 +86,6 @@ def load_best_model(
         print(f"Epoch: {checkpoint['epoch']}, Loss: {checkpoint.get('loss', 'N/A')}")
 
     return model, vocab, config
-
-
-def load_latest_model(
-        checkpoint_dir: str = None,
-        device: str = None
-) -> Tuple[torch.nn.Module, Dict, Config]:
-    """
-    Load the latest model from checkpoint directory.
-
-    Args:
-        checkpoint_dir: Directory containing checkpoints
-        device: Device to load model on
-
-    Returns:
-        Tuple of (model, vocab, config)
-    """
-    if checkpoint_dir is None:
-        checkpoint_dir = default_config.checkpoint_dir
-
-    if device is None:
-        device = default_config.device
-
-    checkpoint_path = Path(checkpoint_dir) / "latest_model.pth"
-
-    if not checkpoint_path.exists():
-        # If latest doesn't exist, try best
-        return load_best_model(checkpoint_dir, device)
-
-    return load_model(str(checkpoint_path), device=device)
-
 
 def load_model(
         checkpoint_path: str,
@@ -181,3 +150,31 @@ def load_model(
         print(f"Epoch: {checkpoint['epoch']}, Loss: {checkpoint.get('loss', 'N/A')}")
 
     return model, vocab, config
+
+def load_latest_model(
+        checkpoint_dir: str = None,
+        device: str = None
+) -> Tuple[torch.nn.Module, Dict, Config]:
+    """
+    Load the latest model from checkpoint directory.
+
+    Args:
+        checkpoint_dir: Directory containing checkpoints
+        device: Device to load model on
+
+    Returns:
+        Tuple of (model, vocab, config)
+    """
+    if checkpoint_dir is None:
+        checkpoint_dir = default_config.checkpoint_dir
+
+    if device is None:
+        device = default_config.device
+
+    checkpoint_path = Path(checkpoint_dir) / "latest_model.pth"
+
+    if not checkpoint_path.exists():
+        # If latest doesn't exist, try best
+        return load_best_model(checkpoint_dir, device)
+
+    return load_model(str(checkpoint_path), device=device)
