@@ -1,7 +1,7 @@
 # tests/test_config.py
 """Unit tests for configuration module."""
 
-import pytest
+
 import torch
 from pathlib import Path
 

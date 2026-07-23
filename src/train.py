@@ -64,8 +64,6 @@ def save_checkpoint(
         pickle.dump(config, f)
 
 
-
-
 def train_one_epoch(
     model: nn.Module,
     dataloader: DataLoader,
