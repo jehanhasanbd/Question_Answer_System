@@ -1,3 +1,4 @@
+# src/checkpoint.py
 """Checkpoint management utilities."""
 
 import torch

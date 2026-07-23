@@ -1,3 +1,4 @@
+# src/train.py
 """Training module for the Q&A LSTM model."""
 
 import torch

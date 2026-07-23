@@ -1,3 +1,4 @@
+# src/config.py
 """Configuration settings for the Q&A LSTM model."""
 from datetime import datetime
 from dataclasses import dataclass

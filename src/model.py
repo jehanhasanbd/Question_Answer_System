@@ -1,3 +1,4 @@
+# src/model.py
 """Model definition for Question-Answering LSTM."""
 
 import torch

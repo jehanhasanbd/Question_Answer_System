@@ -1,3 +1,4 @@
+# script/train_model.py
 """Run training script - can be executed from any directory."""
 
 import sys
